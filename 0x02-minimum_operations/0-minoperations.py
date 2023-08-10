@@ -10,19 +10,17 @@
 
 
 def minOperations(n):
-    """
-    Single character H
-    Fewest number of operations
-    """
-
-    if n <= 1:
+    if n == 1:
         return 0
-    numbr, index, operations = n, 2, 0
-
-    while numbr > 1:
-        if numbr % index == 0:
-            numbr = numbr / index
-            operations = operations + index
-        else:
-            index += 1
-    return operations 
+    
+    # Initialize the minimum operations for each index up to n
+    dp = [0] * (n + 1)
+    
+    for i in range(2, n + 1):
+        dp[i] = i  # Initialize with a value that is easy to beat
+        
+        for j in range(2, i):
+            if i % j == 0:
+                dp[i] = min(dp[i], dp[j] + i // j)
+    
+    return dp[n]
