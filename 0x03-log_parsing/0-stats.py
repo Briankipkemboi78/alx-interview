@@ -1,35 +1,43 @@
-#!/usr/bin/python3
-"""log parsing"""
+#!/usr/bin/env python3
+
 import sys
+import signal
+from collections import defaultdict
 
-
-def print_data(total_file_size, status_code_data):
-    """prints total size and status code count"""
-    print('File size: {}'.format(total_file_size))
-    for k, v in sorted(status_code_data.items()):
-        if v != 0:
-            print('{}: {}'.format(k, v))
-
-
-status_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
-status_code_data = {code: 0 for code in status_codes}
+# Initialize variables
 total_file_size = 0
-try:
-    count = 0
-    for line in sys.stdin:
-        splitstr = line.split()
-        try:
-            total_file_size += int(splitstr[-1])
-            code = splitstr[-2]
-            if code in status_code_data:
-                count += 1
-                status_code_data[code] += 1
-                if count % 10 == 0:
-                    print_data(total_file_size, status_code_data)
-        except:
-            pass
-except KeyboardInterrupt:
-    print_data(total_file_size, status_code_data)
-    raise
-else:
-    print_data(total_file_size, status_code_data)
+status_code_counts = defaultdict(int)
+line_count = 0
+
+def print_statistics():
+    print(f"File size: {total_file_size}")
+    for status_code in sorted(status_code_counts.keys()):
+        print(f"{status_code}: {status_code_counts[status_code]}")
+    print()
+
+def handle_interrupt(signal, frame):
+    print_statistics()
+    sys.exit(0)
+
+# Register the signal handler for CTRL+C
+signal.signal(signal.SIGINT, handle_interrupt)
+
+# Process each line from stdin
+for line in sys.stdin:
+    try:
+        _, _, _, _, _, _, _, status_code_str, file_size_str = line.strip().split()
+        status_code = int(status_code_str)
+        file_size = int(file_size_str)
+
+        # Update metrics
+        total_file_size += file_size
+        status_code_counts[status_code] += 1
+        line_count += 1
+
+        # Print statistics every 10 lines
+        if line_count % 10 == 0:
+            print_statistics()
+
+    except ValueError:
+        # Skip invalid lines
+        pass
