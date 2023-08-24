@@ -1,34 +1,42 @@
 #!/usr/bin/python3
-'''determines if a given data set represents a valid utf-8 encoding'''
+'''Determines if a given data set represents a valid UTF-8 encoding.'''
 
 def valid_utf8(data):
-    # number of bytes
-    numberOfBytes = 0
+    '''Check if data is a valid UTF-8 encoding.
 
-    # looping through dataset
+    Args:
+        data (list): List of integers representing bytes of data.
+
+    Returns:
+        bool: True if data is a valid UTF-8 encoding, else False.
+    '''
+    # Number of bytes
+    number_of_bytes = 0
+
+    # Looping through dataset
     for num in data:
-        # get binary representation
-        # get least significant 8-bits
-        binaryRepresentation = format(num, '#010b')[-8:]
+        # Get binary representation
+        # Get least significant 8-bits
+        binary_representation = format(num, '#010b')[-8:]
 
-        # if no bytes then process new utf-8 character
-        if numberOfBytes == 0:
-            # get number of 1s at beginning of string
-            for bit in binaryRepresentation:
+        # If no bytes, process new UTF-8 character
+        if number_of_bytes == 0:
+            # Get number of 1s at the beginning of string
+            for bit in binary_representation:
                 if bit == '0':
                     break
-                numberOfBytes += 1
+                number_of_bytes += 1
 
-            if numberOfBytes == 0:
+            if number_of_bytes == 0:
                 continue
 
-            if numberOfBytes == 1 or numberOfBytes > 4:
+            if number_of_bytes == 1 or number_of_bytes > 4:
                 return False
 
         else:
-            if not (binaryRepresentation[0] == '1' and binaryRepresentation[1] == '0'):
+            if not (binary_representation[0] == '1' and binary_representation[1] == '0'):
                 return False
 
-        numberOfBytes -= 1
+        number_of_bytes -= 1
 
-    return numberOfBytes == 0
+    return number_of_bytes == 0
