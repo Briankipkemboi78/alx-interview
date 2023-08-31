@@ -2,99 +2,57 @@
 '''solving nqueens problem'''
 import sys
 
+def is_safe(board, row, col, N):
+    # Check if there is a queen attacking in the same column
+    for i in range(row):
+        if board[i][col] == 1:
+            return False
 
-def is_valid(board, row, col):
-    """
-    Checks if a position of the queen is valid
-    Args:
-        board: 2D array representing the board
-        row: row of the queen
-        col: column of the queen
-    Returns:
-        Boolean: True if the position is valid, False otherwise
-    """
-    # Check this row on left side
-    if 1 in board[row]:
-        return False
-
-    upper_diag = zip(range(row, -1, -1),
-                     range(col, -1, -1))
-    for i, j in upper_diag:
+    # Check upper left diagonal
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
         if board[i][j] == 1:
             return False
 
-    lower_diag = zip(range(row, len(board), 1),
-                     range(col, -1, -1))
-    for i, j in lower_diag:
+    # Check upper right diagonal
+    for i, j in zip(range(row, -1, -1), range(col, N)):
         if board[i][j] == 1:
             return False
 
     return True
 
+def solve_nqueens_util(board, row, N):
+    if row == N:
+        print_solution(board)
+        return
 
-def nqueens_helper(board, col):
-    """
-    Helper function for nqueens
-    Args:
-        board: 2D array representing the board
-        col: column to start from
-    Returns:
-        Boolean: True if a solution is found, False otherwise
-    """
-    if col >= len(board):
-        print_board(board, len(board))
-    for i in range(len(board)):
-        if is_valid(board, i, col):
-            board[i][col] = 1
-            result = nqueens_helper(board, col + 1)
-            if result:
-                return True
-            board[i][col] = 0
-    return False
+    for col in range(N):
+        if is_safe(board, row, col, N):
+            board[row][col] = 1
+            solve_nqueens_util(board, row + 1, N)
+            board[row][col] = 0
 
+def solve_nqueens(N):
+    board = [[0] * N for _ in range(N)]
+    solve_nqueens_util(board, 0, N)
 
-def print_board(board, n):
-    """
-    Prints positions of the queens
-    Args:
-        board: 2D array representing the board
-        n: size of the board
-    Returns:
-        None
-    """
-    b = []
-
-    for i in range(n):
-        for j in range(n):
-            if board[i][j] == 1:
-                b.append([i, j])
-    print(b)
-
-
-def nqueens(n):
-    """
-    Finds all possible solutions to the n-queens problem
-    Args:
-        n: size of the board
-    Returns:
-        None
-    """
-    board = []
-    for i in range(n):
-        row = [0] * n
-        board.append(row)
-    nqueens_helper(board, 0)
-
+def print_solution(board):
+    for row in board:
+        print(" ".join("Q" if cell == 1 else "." for cell in row))
+    print()
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
-        exit(1)
-    queens = sys.argv[1]
-    if not queens.isnumeric():
+        sys.exit(1)
+    
+    try:
+        N = int(sys.argv[1])
+    except ValueError:
         print("N must be a number")
-        exit(1)
-    elif int(queens) < 4:
+        sys.exit(1)
+
+    if N < 4:
         print("N must be at least 4")
-        exit(1)
-    nqueens(int(queens))
+        sys.exit(1)
+    
+    solve_nqueens(N)
