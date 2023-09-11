@@ -5,7 +5,7 @@
 
 const myArgs = process.argv.slice(2);
 const request = require('request');
-const url = 'https://swapi-api.hbtn.io/api/films/' + myArgs[0];
+const url = 'https://swapi-api.alx-tools.com/api/' + myArgs[0];
 
 request(url, async function (error, response, body) {
   if (!error) {
